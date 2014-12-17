@@ -1,0 +1,10 @@
+Java WordNet Similarity v1.0.0
+Copyright (C) 2006-2007 The University of Sheffield
+Developed by Mark A. Greenwood <m.greenwood@dcs.shef.ac.uk>
+
+=======================================================================
+Version 1.0.0 (Released 13/04/2007)
+=======================================================================
+The initial public release. This currently only contains the JCn and
+Lin measures and supporting code. Hopefully more measures will be added
+very soon.

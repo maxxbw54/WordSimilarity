@@ -1,0 +1,14 @@
+#These are semantic class labels which we may want to use
+#in any domain (the senses are for WordNet 2)
+namperson	person#n#1
+namcompany	organisation#n#3
+namorganisation	organisation#n#3
+nampost		post#n#3
+namlocation	geographic_area#n#1
+nammoney	money#n#1
+namdate		day#n#2
+
+#These are domain dependent tags which could actually appear
+#in any documents and don't change depending on the domain of the
+#document being considered
+namprotein	protein#n#1

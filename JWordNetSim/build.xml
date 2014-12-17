@@ -1,0 +1,121 @@
+<project basedir="." default="jar" name="JWordNetSim">
+	<description>
+		A pure Java package implementing a number of the popular WordNet
+		similarity measures.
+	</description>
+	
+	<!-- You shouldn't have to alter anything below this line -->
+	
+	<property name="build.compiler"  value="modern"/>
+	
+	<property name="src" value="src"/>
+	<property name="lib" value="lib"/>
+	<property name="classes" value="classes"/>
+	<property name="test" value="test"/>
+	<property name="javadoc" value="javadoc"/>
+	<property name="dist" value="dist"/>	
+	
+	<property name="jar.file" value="JWordNetSim.jar"/>	
+	
+	<target name="prepare-compile">
+		<uptodate property="do.not.build" >
+			<srcfiles dir= "${src}" includes="**/*"/>
+			<mapper type="glob" from="*.java" to="../${classes}/*.class"/>
+		</uptodate>
+		<mkdir dir="classes"/>
+	</target>
+		
+	<target name="prepare-doc">
+		<uptodate property="do.not.doc">
+			<srcfiles dir="${classes}" includes="**/*" excludes="**/*$*"/>
+			<mapper type="glob" from="*.class" to="../${javadoc}/*.html"/>
+		</uptodate>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${classes}"/>
+		<delete dir="${javadoc}"/>
+		<delete file="${jar.file}"/>
+	</target>
+	
+	<target name="build.number" unless="do.not.build" depends="prepare-compile">
+		<propertyfile file="version.info" comment="Version Information">
+			<entry key="build.number" default="0" type="int" operation="+"/>
+			<entry key="build.date" type="date" value="now" pattern="dd/MM/yyyy"/>
+		</propertyfile>
+	</target>
+	
+	<target name="compile" depends="build.number" unless="do.not.build">
+		<javac destdir="${classes}" srcdir="${src}" source="1.5" target="1.5" debug="true">
+			<classpath>
+				<fileset dir="${lib}">
+					<include name="**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>				
+	</target>
+		
+	<target name="jar" depends="compile">
+		<jar file="${jar.file}" update="false">
+			<fileset dir="${classes}"/>
+			<fileset file="version.info"/>
+		</jar>
+	</target>
+	
+	<target name="full" depends="clean,jar"/>
+	
+	<target name="test">
+		<available file="${jar.file}" property="okToTest"/>
+		<fail unless="okToTest" message="The library must be built before testing, please run 'ant jar' then try running the test again."/>
+		<javac destdir="${test}" srcdir="${test}" source="1.5" target="1.5" debug="true">
+			<classpath>
+				<fileset file="${jar.file}"/>
+				<fileset dir="${lib}">
+					<include name="**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+		<java fork="true" classname="Test">
+			<classpath>
+				<fileset file="${jar.file}"/>
+				<fileset dir="${lib}">
+					<include name="**/*.jar"/>
+				</fileset>
+				<pathelement path="${test}"/>
+			</classpath>
+			<arg value="${wordnet}"/>
+		</java>
+	</target>
+	
+	<target name="javadoc" depends="jar,prepare-doc" unless="do.not.doc">
+		<property file="version.info"/>
+		<javadoc footer="Copyright (C) 2006 - 2007 The University of Sheffield" source="1.5" windowtitle="Java WordNet Similarity API - v${version.major}.${version.minor}.${version.bugfix} build ${build.number}" sourcepath="${src}" destdir="${javadoc}" packagenames="shef.nlp.wordnet.*">
+			<classpath>
+				<fileset file="${jar.file}"/>
+				<fileset dir="${lib}">
+					<include name="**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javadoc>
+	</target>
+	
+	<target name="dist" depends="clean,javadoc">
+		<property file="version.info"/>
+		<mkdir dir="${dist}"/>
+		<property name="archive" location="${dist}/WordNetSim-v${version.major}.${version.minor}.${version.bugfix}.zip"/>
+		<zip destfile="${archive}" update="false" duplicate="preserve" compress="true">
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
+				<include name="${jar.file}"/>	
+				<include name="COPYING"/>
+				<include name="HISTORY"/>
+				<include name="README"/>
+				<include name="build.xml"/>
+				<include name="${src}/**"/>
+				<include name="${javadoc}/**"/>
+				<include name="${lib}/**"/>
+				<include name="${test}/**"/>
+				<exclude name="**/*.class"/>
+			</zipfileset>      
+		</zip>
+	</target>
+</project>
